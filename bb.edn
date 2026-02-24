@@ -1,0 +1,15 @@
+{:deps {io.github.amiorin/alice {:local/root "."}}
+ :tasks
+ {:requires ([io.github.amiorin.alice.package :as package]
+             [io.github.amiorin.alice.tools :as tools])
+  tidy {:doc "tidy clojure files"
+        :task (do (shell "clojure-lsp clean-ns")
+                  (shell "clojure-lsp format"))}
+  tofu {:doc "bb tofu render tofu:init lock tofu:apply:-auto-approve"
+        :task (tools/tofu* *command-line-args*)}
+  ansible {:doc "bb ansible render ansible-playbook:main.yml unlock-any"
+           :task (tools/ansible* *command-line-args*)}
+  ansible-local {:doc "bb ansible render ansible-playbook:main.yml unlock-any"
+                 :task (tools/ansible-local* *command-line-args*)}
+  alice {:doc "bb alice create"
+         :task (package/alice* *command-line-args*)}}}
