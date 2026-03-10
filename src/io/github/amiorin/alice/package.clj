@@ -1,5 +1,6 @@
 (ns io.github.amiorin.alice.package
   (:require
+   [babashka.fs :as fs]
    [babashka.process :as p]
    [big-config :as bc]
    [big-config.core :as core]
@@ -17,13 +18,26 @@
 
 (defn opts-fn
   [opts]
-  (let [dir (workflow/path opts ::tools/tofu)
-        ip (-> (p/shell {:dir dir
-                         :out :string} "tofu show --json")
-               :out
-               (json/parse-string keyword)
-               (->> (s/select-one [:values :root_module :resources s/FIRST :values :ipv4_address])))]
-    (merge-with merge opts {::workflow/params {:ip ip}})))
+  (let [default-params {:ip "192.168.0.1"
+                        :name "alice"}
+        dir (workflow/path opts ::tools/tofu)]
+    (merge-with merge opts {::workflow/params (if (fs/exists? dir)
+                                                (-> (p/shell {:dir dir
+                                                              :out :string} "tofu output --json")
+                                                    :out
+                                                    (json/parse-string keyword)
+                                                    (->> (s/select-one [:params :value]))
+                                                    (->> (merge default-params)))
+                                                default-params)})))
+
+(defn alice-opts
+  [opts]
+  (-> opts
+      (workflow/new-prefix ::start-create-or-delete)
+      opts-fn))
+
+(comment
+  (alice-opts {}))
 
 (def create
   (workflow/->workflow* {:first-step ::start-create-or-delete

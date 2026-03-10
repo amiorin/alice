@@ -35,3 +35,10 @@ resource "digitalocean_droplet" "ubuntu_droplet" {
     inline = ["ls"]
   }
 }
+
+output "params" {
+  value = {
+    ip = digitalocean_droplet.ubuntu_droplet.ipv4_address
+    name = "alice"
+  }
+}
