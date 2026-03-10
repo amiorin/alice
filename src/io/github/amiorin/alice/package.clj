@@ -19,7 +19,8 @@
 (defn opts-fn
   [opts]
   (let [default-params {:ip "192.168.0.1"
-                        :name "alice"}
+                        :name "alice"
+                        :user "ubuntu"}
         dir (workflow/path opts ::tools/tofu)]
     (merge-with merge opts {::workflow/params (if (fs/exists? dir)
                                                 (-> (p/shell {:dir dir
