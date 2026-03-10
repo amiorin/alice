@@ -40,5 +40,6 @@ output "params" {
   value = {
     ip = digitalocean_droplet.ubuntu_droplet.ipv4_address
     name = "alice"
+    user = "root"
   }
 }
